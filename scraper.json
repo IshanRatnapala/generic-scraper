@@ -1,9 +1,9 @@
 {
-    "url": "",
+    "url": "http://site.toscrape.com",
     "section": {
         "container": {
             "type": "div",
-            "class": "travel-guide-inner",
+            "class": "guide-inner",
             "pos": 0
         },
         "content": {
@@ -15,32 +15,62 @@
             "Category": {
                 "type": "div",
                 "class": "span5",
-                "pos": 0
+                "pos": 0,
+                "findByContent": {
+                    "findByType": "div",
+                    "findByClass": "span1",
+                    "withContent": "Category:"
+                }
             },
             "Languages": {
                 "type": "div",
                 "class": "span5",
-                "pos": 1
+                "pos": 0,
+                "findByContent": {
+                    "findByType": "div",
+                    "findByClass": "span1",
+                    "withContent": "Languages:"
+                }
             },
             "Tel": {
                 "type": "div",
                 "class": "span5",
-                "pos": 2
+                "pos": 0,
+                "findByContent": {
+                    "findByType": "div",
+                    "findByClass": "span1",
+                    "withContent": "Tel"
+                }
             },
             "Address": {
                 "type": "div",
                 "class": "span5",
-                "pos": 3
+                "pos": 0,
+                "findByContent": {
+                    "findByType": "div",
+                    "findByClass": "span1",
+                    "withContent": "Address"
+                }
             },
             "Registration No": {
                 "type": "div",
                 "class": "span5",
-                "pos": -2
+                "pos": 0,
+                "findByContent": {
+                    "findByType": "div",
+                    "findByClass": "span1",
+                    "withContent": "Registration No"
+                }
             },
             "Email": {
                 "type": "div",
                 "class": "span5",
-                "pos": -1
+                "pos": 0,
+                "findByContent": {
+                    "findByType": "div",
+                    "findByClass": "span1",
+                    "withContent": "Email"
+                }
             }
         }
     },
