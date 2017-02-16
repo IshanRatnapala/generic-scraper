@@ -1,4 +1,4 @@
-## Generic website scraper
+# Generic website scraper
 
 Edit the _scraper.json_ file and run ```python app.py```  
 The data will be exported to _export.csv_
