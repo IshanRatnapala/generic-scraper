@@ -21,38 +21,59 @@ def init():
     startScrapingPage(data, data['url'])
 
 
+# Begin scraping process for a given url
 def startScrapingPage(data, url):
     logging.info('Scraping URL: %s' % url)
     soup = getPageContent(url)
     iterSections(soup, data)
 
 
-def filterSoup(soup, data, filterByPos=False):
-    # If filterByPos=False: returns a List of bs4 elements
-    # If filterByPos=True: returns the filtered bs4 element
+# Filter given soup
+def filterSoup(soup, data, returnText=False):
+    filteredItem = soup.find_all(data['type'], class_=data['class'])
     try:
-        content = soup.find_all(data['type'], class_=data['class'])
-        if filterByPos:
-            content = content[data['pos']]
-        return content
-    except IndexError:
-        # print sys.exc_info()[0]
-        logging.error("Something went wrong while filtering.")
+        if data.get('findByContent') is not None:
+            findByType = data['findByContent']['findByType']
+            findByClass = data['findByContent']['findByClass']
+            withContent = data['findByContent']['withContent']
+            content = soup.find_all(findByType, findByClass)
+
+            filterByItem = None
+            for item in content:
+                if item.get_text().strip() == withContent:
+                    filterByItem = item
+
+            filteredItem = filterByItem.parent.find_all(data['type'], class_=data['class'])
+    except KeyError:
+        print 'findByContent not specified. Trying finding by position.'
+
+    try:
+        filteredItem = filteredItem[data['pos']]
+    except KeyError:
+        print 'Pos not specified.'
+
+    if returnText:
+        filteredItem = filteredItem.get_text().strip()
+
+    return filteredItem
 
 
+# Scrape data from the soup
 def scrapeContent(soup, fields):
     global sectionCount
     content = OrderedDict()
     for key, value in fields.iteritems():
         try:
-            content[key] = filterSoup(soup, value, True).get_text().strip()
+            content[key] = filterSoup(soup, value, True)
         except AttributeError:
             content[key] = ''
 
     sectionCount += 1
+
     return content
 
 
+# Iterate through the valid sections to scrape in the page
 def iterSections(soup, data):
     # If you want to scrape multiple sections
     # crete another json and run the program
@@ -70,11 +91,12 @@ def iterSections(soup, data):
     findNext(soup, data)
 
 
+# Find next page and start scraping
 def findNext(soup, data):
     try:
         container = data['next']['container']
         link = data['next']['link']
-        nextPageLink = filterSoup(filterSoup(soup, container, True), link, True)
+        nextPageLink = filterSoup(filterSoup(soup, container), link)
         if nextPageLink is None:
             logging.info('\n> All done! \n> Scraped %d section(s) in %d page(s)' % (sectionCount, pageCount))
         else:
@@ -88,6 +110,7 @@ def findNext(soup, data):
         logging.error("Couldn't find the link to the next page. Please verify the 'next' values in the JSON")
 
 
+# Get the page content of the given URL
 def getPageContent(url):
     global pageCount
     response = requests.get(url)
@@ -97,6 +120,7 @@ def getPageContent(url):
     return soup
 
 
+# Read the JSON with the config
 def readJSON():
     with open(JSON_FILE) as data_file:
         data = json.load(data_file, object_pairs_hook=OrderedDict)
@@ -104,6 +128,7 @@ def readJSON():
     return data
 
 
+# Export data to a CSV file
 def export(data):
     global overwriteCSV
     if overwriteCSV:
